@@ -1,8 +1,1 @@
-grep -l "sample" dataset/* | while read file; do
-    count=$(grep -o "CSC510" "$file" | wc -l)
-    size=$(stat -f %z "$file")
-    if [ "$count" -ge 3 ]; then
-        new_name=$(echo "$file" | sed 's/file_/filtered_/')
-        echo "$count $size $new_name"
-    fi
-done | sort -k1,1nr -k2,2nr
+grep -l "sample" ./dataset1/* | xargs grep -o "CSC510" | uniq -c | grep -E "^\s+[3-9][0-9]*|^\s+[1-9][0-9]+\s\w+" | gawk '{print $1, $2}' | sed 's/:CSC510$//' | xargs -I {} sh -c 'file=$(echo "{}" | gawk "{print \$2}"); echo "{}" $(stat -c%s "$file")' | sort -k1,1nr -k3,3nr | sed 's/file/filtered/'
