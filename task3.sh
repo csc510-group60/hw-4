@@ -1,7 +1,7 @@
-#!/bin/bash
-
-# Step 1: Extract passengers from 2nd class who embarked at Southampton.
-# Step 2: Replace "male" with "M" and "female" with "F".
-# Step 3: Calculate the average age of the filtered passengers.
-
-awk -F, '$3==2 && $NF ~ /^S/ {print $0} {sum += $7} END {print "Average age:", sum / NR}' titanic.csv | sed 's/male,/M,/g' | sed 's/female,/F,/g' 
+cat titanic.csv \
+| gawk -F, '{print $6" "$7" "$3" "$13" "$4" "$5}' \
+| grep -E '[0-9]+\s[2]\sS' \
+| sed 's/female/F/' \
+| sed 's/male/M/' \
+| awk '{ sum += $2; n++; print $4" "$5" "$6" "$7" "$1" "$2" "$3} 
+       END { if (n > 0) print "Average Age: " sum/n; }'
