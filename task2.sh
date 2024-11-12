@@ -1,9 +1,18 @@
-grep -l "sample" ./dataset1/* \
-| xargs grep -o "CSC510" \
-| uniq -c \
-| grep -E "^\s+[3-9][0-9]*|^\s+[1-9][0-9]+\s\w+" \
-| gawk '{print $1, $2}' \
+#!/bin/bash
+
+grep -l "sample" dataset1/file* \
+| xargs -I{} grep -oH "CSC510" "{}" \
 | sed 's/:CSC510$//' \
-| xargs -I {} sh -c 'file=$(echo "{}" | gawk "{print \$2}"); echo "{}" $(stat -c%s "$file")' \
+| sort \
+| uniq -c \
+| awk '$1 >= 3' \
+| gawk '{
+    cmd = "wc -c \"" $2 "\""
+    cmd | getline line
+    close(cmd)
+    split(line, arr, " ")
+    size = arr[1]
+    printf "%10d %s %d\n", $1, $2, size
+}' \
 | sort -k1,1nr -k3,3nr \
-| sed 's/file/filtered/'
+| sed 's/file_/filtered_/g'  
